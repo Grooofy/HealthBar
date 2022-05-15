@@ -1,16 +1,20 @@
 ﻿    using UnityEngine;
-    
+    using UnityEngine.Events;
+
     public class Player : MonoBehaviour
     { 
         [SerializeField] private float _heath;
-        [SerializeField] private HUD _hud;
 
+        public event UnityAction<float> HealthEstablished;
+        public event UnityAction<float> HealthIncreased;
+        public event UnityAction<float> HealthDecreased;
+        
         private float _maxHealth;
-
+        
         private void Start()
         {
             _maxHealth = _heath;
-            _hud.SetMaxHeathValue(_maxHealth);
+            HealthEstablished?.Invoke(_maxHealth);
         }
 
         public void TakeDamage(float damage)
@@ -19,7 +23,7 @@
                 Debug.Log("I'm died");
             
             _heath -= damage;
-            _hud.ReduceHeathValue(_heath);
+            HealthDecreased?.Invoke(_heath);
         }
 
         public void Heal(float value)
@@ -33,6 +37,6 @@
                 _heath = _maxHealth;
             }
             _heath += value;
-            _hud.AddHeathValue(_heath);
+            HealthIncreased?.Invoke(_heath);
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,10 +7,25 @@ using UnityEngine.UI;
 public class HUD : MonoBehaviour
 {
     [SerializeField] private Gradient _gradient;
+    [SerializeField] private Player _player;
     
     private Slider _slider;
     private Coroutine _coroutine;
     private ColorChanger _colorChanger;
+
+    private void OnEnable()
+    {
+        _player.HealthEstablished += SetMaxHeathValue;
+        _player.HealthIncreased += AddHeathValue;
+        _player.HealthDecreased += ReduceHeathValue;
+    }
+
+    private void OnDisable()
+    {
+        _player.HealthEstablished -= SetMaxHeathValue;
+        _player.HealthIncreased -= AddHeathValue;
+        _player.HealthDecreased -= ReduceHeathValue;
+    }
 
     private void Awake()
     {
@@ -17,14 +33,14 @@ public class HUD : MonoBehaviour
         _colorChanger = GetComponentInChildren<ColorChanger>();
     }
 
-    public void SetMaxHeathValue(float maxHealth)
+    private void SetMaxHeathValue(float maxHealth)
     {
         _slider.maxValue  = maxHealth;
         _slider.value = _slider.maxValue;
         _colorChanger.SetColor(_gradient.Evaluate(1f));
     }
 
-    public void AddHeathValue(float health)
+    private void AddHeathValue(float health)
     {
         if (_coroutine != null)
             StopCoroutine(_coroutine);
@@ -32,7 +48,7 @@ public class HUD : MonoBehaviour
         _coroutine = StartCoroutine(FadeHeath(health));
     }
 
-    public void ReduceHeathValue(float health)
+    private void ReduceHeathValue(float health)
     {
         if (_coroutine != null)
             StopCoroutine(_coroutine);
